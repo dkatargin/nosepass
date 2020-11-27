@@ -33,7 +33,7 @@ show_env:
 .PHONY: build
 build: show_env
 	@echo ">> build sociald"
-	$(GO) build -o ./bin/mypass ./src/store/
+	$(GO) build -o ./bin/mypass .
 	@echo ">> done"
 
 .PHONY: clean
