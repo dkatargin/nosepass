@@ -15,6 +15,7 @@ func help() {
 }
 
 func main() {
+	// Main func with args
 	var appError error
 
 	switch cmdType := os.Args[1]; cmdType {

@@ -7,11 +7,11 @@ import (
 )
 
 func StorePassword(dstPath string) error {
+	// Store user password to storage with public key
 	publicKey, err := encryption.RSAGetPublicKey()
 	if err != nil {
 		return err
 	}
-
 	fmt.Print("Input password: ")
 	binpass, err := terminal.ReadPassword(0)
 	plainText := string(binpass)
@@ -29,6 +29,7 @@ func StorePassword(dstPath string) error {
 }
 
 func GetPassword(dstPath string) (string, error) {
+	// Retrieve user password from storage with private key and passphrase
 	key, err := getKey(dstPath)
 	if err != nil {
 		return "", err
@@ -47,6 +48,7 @@ func GetPassword(dstPath string) (string, error) {
 }
 
 func ListPassword() ([]string, error) {
+	// Show list of user password names
 	keys, err := listKeys()
 	if err != nil {
 		return nil, err
@@ -59,6 +61,7 @@ func ListPassword() ([]string, error) {
 }
 
 func DeletePassword(dstPath string) error {
+	//Delete password from storage
 	err := deleteKey(dstPath)
 	return err
 }

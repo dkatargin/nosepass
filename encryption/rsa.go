@@ -35,7 +35,7 @@ func RSAGenerateKeyPair() (*pem.Block, *pem.Block, error) {
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(privatekey),
 	}
-
+	// Encrypt private key by passphrase
 	privateKeyBlock, err = x509.EncryptPEMBlock(rand.Reader, privateKeyBlock.Type, privateKeyBlock.Bytes, []byte(passphrase), x509.PEMCipherAES256)
 
 	// Public Key
@@ -53,16 +53,15 @@ func RSAGenerateKeyPair() (*pem.Block, *pem.Block, error) {
 }
 
 func RSAGetPublicKey() (*rsa.PublicKey, error) {
-	//var publickey *pem.Block
 	configuration, err := Config()
 	if err != nil {
 		return nil, errors.New("wrong config")
 	}
-	// check keydir
+	// Check keydir
 	if _, err := os.Stat(configuration.Keydir); os.IsNotExist(err) {
 		return nil, errors.New("keydir not exist")
 	}
-	// check keys
+	// Check keys
 	privateKeyExist := false
 	publicKeyExist := false
 	if _, err := os.Stat(configuration.Keydir + "private.pem"); !os.IsNotExist(err) {
@@ -101,6 +100,7 @@ func RSAGetPublicKey() (*rsa.PublicKey, error) {
 		return nil, errors.New("public key not exist")
 	}
 
+	// Read public key from file
 	publicDat, err := ioutil.ReadFile(configuration.Keydir + "public.pem")
 	block, _ := pem.Decode(publicDat)
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
@@ -116,24 +116,30 @@ func RSAGetPrivateKey() (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, errors.New("wrong config")
 	}
+	// Check private key
 	if _, err := os.Stat(configuration.Keydir + "private.pem"); os.IsNotExist(err) {
 		return nil, errors.New("private key not exist")
 	}
+	// Read private key from file
 	privateDat, err := ioutil.ReadFile(configuration.Keydir + "private.pem")
 	if err != nil {
 		return nil, err
 	}
 	fmt.Print("Input private key password: ")
+	// Ask user passphrase
 	binpass, err := terminal.ReadPassword(0)
 	passphrase := string(binpass)
+	// Decode pem block
 	pemBlock, _ := pem.Decode(privateDat)
 	if err != nil {
 		return nil, err
 	}
+	// Decrypt pem block
 	der, err := x509.DecryptPEMBlock(pemBlock, []byte(passphrase))
 	if err != nil {
 		return nil, err
 	}
+	// Parse private key
 	privateKey, err := x509.ParsePKCS1PrivateKey(der)
 	if err != nil {
 		return nil, err
@@ -143,6 +149,7 @@ func RSAGetPrivateKey() (*rsa.PrivateKey, error) {
 }
 
 func RSAEncryptData(value string, publicKey *rsa.PublicKey) (string, error) {
+	// Encrypt data by public key
 	encryptedBytes, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, publicKey, []byte(value), nil)
 	if err != nil {
 		return "", err
@@ -152,6 +159,7 @@ func RSAEncryptData(value string, publicKey *rsa.PublicKey) (string, error) {
 }
 
 func RSADecryptData(hexData string, privateKey *rsa.PrivateKey) (string, error) {
+	// Decrypt data by private key
 	ciphertext, err := hex.DecodeString(hexData)
 	if err != nil {
 		return "", err

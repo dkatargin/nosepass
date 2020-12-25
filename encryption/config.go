@@ -10,6 +10,7 @@ type Configuration struct {
 }
 
 func Config() (Configuration, error) {
+	// read config and represent to struct
 	configuration := Configuration{}
 	file, err := os.Open("settings.conf")
 	if err != nil {

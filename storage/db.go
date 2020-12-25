@@ -16,6 +16,7 @@ type secret struct {
 }
 
 func _getDb() (*sql.DB, error) {
+	// Main func for database checks
 	dbPath := "store.db"
 	tableExist := true
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
@@ -37,6 +38,7 @@ func _getDb() (*sql.DB, error) {
 }
 
 func storeKey(path string, ciphertext string) error {
+	// Insert encrypted key to database
 	db, err := _getDb()
 	if err != nil {
 		return err
@@ -52,6 +54,7 @@ func storeKey(path string, ciphertext string) error {
 }
 
 func getKey(path string) (string, error) {
+	// Retrieve encrypted key from database
 	db, err := _getDb()
 	if err != nil {
 		return "", err
@@ -69,6 +72,7 @@ func getKey(path string) (string, error) {
 }
 
 func listKeys() ([]secret, error) {
+	// Query list of key paths
 	db, err := _getDb()
 	if err != nil {
 		return nil, err
@@ -94,6 +98,7 @@ func listKeys() ([]secret, error) {
 }
 
 func deleteKey(dstPath string) error {
+	// Delete encrypted key from database
 	db, err := _getDb()
 	if err != nil {
 		return err
