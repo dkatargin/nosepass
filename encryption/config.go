@@ -1,4 +1,4 @@
-package storage
+package encryption
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 )
 
 type Configuration struct {
-	keydir string
+	Keydir string
 }
 
 func Config() (Configuration, error) {

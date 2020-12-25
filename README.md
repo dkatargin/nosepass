@@ -2,7 +2,8 @@
 #  Nosepass
 ##### Yet another password manager written in GO
 
-### TODO WIP
-* Генерация RSA ключей, где приватный закрыт мастер паролем
-* Сохранение ключей в хранилище (sqlite)
-* Древовидное хранилище ключей (а-ля pass)
+### Usage
+```nosepass show``` - show all passwords paths/names
+```nosepass insert mail/gmail``` - insert password to store (if first keypair will generate automatically)
+```nosepass get mail/gmail``` - retrieve password by path/name
+```nosepass delete mail/gmail``` - retrieve password by path/name

@@ -2,22 +2,55 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"nosepass/storage"
 	"os"
+	"strings"
 )
 
+func help() {
+	fmt.Printf("Nosepass. Simple yet another password manager\n" +
+		"Developed by Dmitry K (ex0hunt) https://github.com/ex0hunt/nosepass" +
+		"\n\nnosepass insert mail/gmail.com\nnosepass get mail/gmail\nnosepass delete mail/gmail\n")
+}
+
 func main() {
-	//nosepass insert mail/gmail.com
-	if len(os.Args) < 3 || os.Args[1] == "help" {
-		fmt.Printf("Nosepass help\n\nnosepass insert mail/gmail.com\n")
-		return
-	}
-	cmdType := os.Args[1]
-	passName := os.Args[2]
+	var appError error
 
-	if cmdType == "insert" {
-		storage.StorePassword(passName)
+	switch cmdType := os.Args[1]; cmdType {
+	case "insert":
+		if len(os.Args) < 2 || os.Args[1] == "help" {
+			help()
+			return
+		}
+		passName := os.Args[2]
+		appError = storage.StorePassword(passName)
+	case "get":
+		if len(os.Args) < 2 || os.Args[1] == "help" {
+			help()
+			return
+		}
+		passName := os.Args[2]
+		pwd, err := storage.GetPassword(passName)
+		appError = err
+		fmt.Printf("\n%s\n", pwd)
+	case "delete":
+		if len(os.Args) < 2 || os.Args[1] == "help" {
+			help()
+			return
+		}
+		passName := os.Args[2]
+		err := storage.DeletePassword(passName)
+		appError = err
+	case "show":
+		listPath, err := storage.ListPassword()
+		appError = err
+		fmt.Println(strings.Join(listPath[:], "\n"))
+	default:
+		help()
 	}
 
-	fmt.Printf("command type is %s\npassword name is %s\n", cmdType, passName)
+	if appError != nil {
+		log.Panic(appError)
+	}
 }

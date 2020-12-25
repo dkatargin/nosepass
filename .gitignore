@@ -1,4 +1,4 @@
-bin/
-keys/
 .idea/
-*.sqlite
+keys/
+*.db
+nosepass
