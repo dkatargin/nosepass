@@ -12,7 +12,7 @@ func StorePassword(dstPath string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Print("Input password: ")
+	fmt.Print("Input password for store: \n")
 	binpass, err := terminal.ReadPassword(0)
 	plainText := string(binpass)
 

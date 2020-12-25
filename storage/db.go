@@ -2,8 +2,10 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"nosepass/common"
 	"os"
 	"time"
 )
@@ -17,9 +19,15 @@ type secret struct {
 
 func _getDb() (*sql.DB, error) {
 	// Main func for database checks
-	dbPath := "store.db"
+	configuration, err := common.Config()
+	if err != nil {
+		return nil, err
+	}
+
+	dbPath := fmt.Sprintf("%s/%s", configuration.DbDir, "store.db")
 	tableExist := true
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		os.MkdirAll(configuration.DbDir, 0700)
 		tableExist = false
 	}
 

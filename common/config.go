@@ -1,12 +1,14 @@
-package encryption
+package common
 
 import (
 	"encoding/json"
 	"os"
+	"strings"
 )
 
 type Configuration struct {
-	Keydir string
+	DbDir  string
+	KeyDir string
 }
 
 func Config() (Configuration, error) {
@@ -21,5 +23,8 @@ func Config() (Configuration, error) {
 	if err != nil {
 		return configuration, err
 	}
+	homeDir, _ := os.UserHomeDir()
+	configuration.DbDir = strings.Replace(configuration.DbDir, "~", homeDir, -1)
+	configuration.KeyDir = strings.Replace(configuration.KeyDir, "~", homeDir, -1)
 	return configuration, nil
 }

@@ -11,12 +11,13 @@ import (
 	"fmt"
 	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
+	"nosepass/common"
 	"os"
 )
 
 func RSAGenerateKeyPair() (*pem.Block, *pem.Block, error) {
 	// Get passphrase
-	fmt.Print("Input password: ")
+	fmt.Print("Input private key passphrase: \n")
 	binpass, err := terminal.ReadPassword(0)
 	passphrase := string(binpass)
 	if err != nil {
@@ -53,21 +54,21 @@ func RSAGenerateKeyPair() (*pem.Block, *pem.Block, error) {
 }
 
 func RSAGetPublicKey() (*rsa.PublicKey, error) {
-	configuration, err := Config()
+	configuration, err := common.Config()
 	if err != nil {
 		return nil, errors.New("wrong config")
 	}
 	// Check keydir
-	if _, err := os.Stat(configuration.Keydir); os.IsNotExist(err) {
-		return nil, errors.New("keydir not exist")
+	if _, err = os.Stat(configuration.KeyDir); os.IsNotExist(err) {
+		os.MkdirAll(configuration.KeyDir, 0700)
 	}
 	// Check keys
 	privateKeyExist := false
 	publicKeyExist := false
-	if _, err := os.Stat(configuration.Keydir + "private.pem"); !os.IsNotExist(err) {
+	if _, err := os.Stat(configuration.KeyDir + "private.pem"); !os.IsNotExist(err) {
 		privateKeyExist = true
 	}
-	if _, err := os.Stat(configuration.Keydir + "public.pem"); !os.IsNotExist(err) {
+	if _, err := os.Stat(configuration.KeyDir + "public.pem"); !os.IsNotExist(err) {
 		publicKeyExist = true
 	}
 	// Generate keypair if not exist
@@ -76,7 +77,7 @@ func RSAGetPublicKey() (*rsa.PublicKey, error) {
 		if err != nil {
 			return nil, err
 		}
-		privatePem, err := os.Create(configuration.Keydir + "private.pem")
+		privatePem, err := os.Create(configuration.KeyDir + "private.pem")
 		if err != nil {
 			return nil, errors.New("error creation private.pem file")
 		}
@@ -84,7 +85,7 @@ func RSAGetPublicKey() (*rsa.PublicKey, error) {
 		if err != nil {
 			return nil, errors.New("error encoding private.pem block")
 		}
-		publicPem, err := os.Create(configuration.Keydir + "public.pem")
+		publicPem, err := os.Create(configuration.KeyDir + "public.pem")
 		if err != nil {
 			return nil, errors.New("error creation public.pem file")
 		}
@@ -101,7 +102,7 @@ func RSAGetPublicKey() (*rsa.PublicKey, error) {
 	}
 
 	// Read public key from file
-	publicDat, err := ioutil.ReadFile(configuration.Keydir + "public.pem")
+	publicDat, err := ioutil.ReadFile(configuration.KeyDir + "public.pem")
 	block, _ := pem.Decode(publicDat)
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
@@ -112,20 +113,20 @@ func RSAGetPublicKey() (*rsa.PublicKey, error) {
 }
 
 func RSAGetPrivateKey() (*rsa.PrivateKey, error) {
-	configuration, err := Config()
+	configuration, err := common.Config()
 	if err != nil {
 		return nil, errors.New("wrong config")
 	}
 	// Check private key
-	if _, err := os.Stat(configuration.Keydir + "private.pem"); os.IsNotExist(err) {
+	if _, err := os.Stat(configuration.KeyDir + "private.pem"); os.IsNotExist(err) {
 		return nil, errors.New("private key not exist")
 	}
 	// Read private key from file
-	privateDat, err := ioutil.ReadFile(configuration.Keydir + "private.pem")
+	privateDat, err := ioutil.ReadFile(configuration.KeyDir + "private.pem")
 	if err != nil {
 		return nil, err
 	}
-	fmt.Print("Input private key password: ")
+	fmt.Print("Input private key passphrase: \n")
 	// Ask user passphrase
 	binpass, err := terminal.ReadPassword(0)
 	passphrase := string(binpass)
