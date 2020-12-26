@@ -14,6 +14,34 @@ func help() {
 		"\n\nnosepass insert mail/gmail.com\nnosepass get mail/gmail\nnosepass delete mail/gmail\n")
 }
 
+func _getNodeInLevel(name string, nodes []PathTreeNode) PathTreeNode {
+	var res PathTreeNode
+	for _, b := range nodes {
+		if b.name == name {
+			res = b
+			break
+		}
+	}
+	return res
+}
+
+type PathTreeNode struct {
+	level     int
+	name      string
+	childrens []PathTreeNode
+}
+
+func passTree(listPass []string) {
+	levels := make(map[int][]PathTreeNode)
+	for _, path := range listPass {
+		nodeList := strings.Split(path, "/")
+		var parentItem PathTreeNode
+		for i, node := range nodeList {
+			parentItem = _getNodeInLevel(node, levels[i])
+		}
+	}
+}
+
 func main() {
 	// Main func with args
 	var appError error
@@ -45,8 +73,11 @@ func main() {
 		appError = err
 	case "show":
 		listPath, err := storage.ListPassword()
+		if err == nil {
+			passTree(listPath)
+		}
 		appError = err
-		fmt.Println(strings.Join(listPath[:], "\n"))
+
 	default:
 		help()
 	}
