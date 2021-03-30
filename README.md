@@ -7,4 +7,4 @@
 ```nosepass show``` - show all passwords paths/names   
 ```nosepass insert mail/gmail``` - insert password to store (if first keypair will generate automatically)   
 ```nosepass get mail/gmail``` - retrieve password by path/name   
-```nosepass delete mail/gmail``` - retrieve password by path/name   
+```nosepass delete mail/gmail``` - delete password by path/name   
